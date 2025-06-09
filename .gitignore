@@ -73,3 +73,24 @@ yarn-error.log
 !.yarn/releases
 !.yarn/sdks
 !.yarn/versions
+
+# Environment files
+.env
+.env.local
+.env.production
+
+# Database files
+*.db
+*.db3
+*.sqlite
+*.sqlite3
+
+# Log files
+*.log
+
+# IDE files
+.vscode/
+.idea/
+
+# Flipper
+flipper-dump/

@@ -1,97 +1,131 @@
-This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
+# PlantTracker 🌱
 
-# Getting Started
+A React Native mobile app to help you track your houseplants, their watering schedules, and care information.
 
-> **Note**: Make sure you have completed the [Set Up Your Environment](https://reactnative.dev/docs/set-up-your-environment) guide before proceeding.
+## Features
 
-## Step 1: Start Metro
+- **Plant Management**: Add, view, and manage your plant collection
+- **Species Database**: Search and select from plant species with care information
+- **Watering Tracking**: Log watering sessions and view history
+- **Care Information**: Get species-specific care instructions and watering schedules
+- **Photo Support**: Capture and store photos of your plants
+- **Smart Reminders**: Receive notifications when plants need watering
 
-First, you will need to run **Metro**, the JavaScript build tool for React Native.
+## Tech Stack
 
-To start the Metro dev server, run the following command from the root of your React Native project:
+- **Frontend**: React Native 0.79.3 with TypeScript
+- **Navigation**: React Navigation 7.x (Tab + Stack)
+- **Database**: SQLite with react-native-sqlite-storage
+- **API Integration**: Plant care data from Perenual API
+- **Image Handling**: react-native-image-picker
+- **HTTP Client**: Axios
 
-```sh
-# Using npm
-npm start
+## Getting Started
 
-# OR using Yarn
-yarn start
+### Prerequisites
+
+- Node.js (>=18)
+- React Native development environment
+- Android Studio (for Android) or Xcode (for iOS)
+
+### Installation
+
+1. Clone the repository:
+```bash
+git clone https://github.com/dtrouton/plants.git
+cd plants/PlantTracker
 ```
 
-## Step 2: Build and run your app
+2. Install dependencies:
+```bash
+npm install
+```
 
-With Metro running, open a new terminal window/pane from the root of your React Native project, and use one of the following commands to build and run your Android or iOS app:
+3. For iOS, install pods:
+```bash
+cd ios && pod install && cd ..
+```
 
-### Android
+4. Start the Metro bundler:
+```bash
+npm start
+```
 
-```sh
-# Using npm
+5. Run the app:
+```bash
+# For Android
 npm run android
 
-# OR using Yarn
-yarn android
-```
-
-### iOS
-
-For iOS, remember to install CocoaPods dependencies (this only needs to be run on first clone or after updating native deps).
-
-The first time you create a new project, run the Ruby bundler to install CocoaPods itself:
-
-```sh
-bundle install
-```
-
-Then, and every time you update your native dependencies, run:
-
-```sh
-bundle exec pod install
-```
-
-For more information, please visit [CocoaPods Getting Started guide](https://guides.cocoapods.org/using/getting-started.html).
-
-```sh
-# Using npm
+# For iOS
 npm run ios
-
-# OR using Yarn
-yarn ios
 ```
 
-If everything is set up correctly, you should see your new app running in the Android Emulator, iOS Simulator, or your connected device.
+## Project Structure
 
-This is one way to run your app — you can also build it directly from Android Studio or Xcode.
+```
+src/
+├── components/          # Reusable UI components
+├── database/           # SQLite database setup and services
+├── navigation/         # React Navigation configuration
+├── screens/           # App screens/pages
+├── services/          # API services and external integrations
+├── types/             # TypeScript type definitions
+└── utils/             # Utility functions
+```
 
-## Step 3: Modify your app
+## Database Schema
 
-Now that you have successfully run the app, let's make changes!
+### Plants Table
+- Basic plant information (name, location, photos)
+- Links to species data for care information
+- Tracks last watering date
 
-Open `App.tsx` in your text editor of choice and make some changes. When you save, your app will automatically update and reflect these changes — this is powered by [Fast Refresh](https://reactnative.dev/docs/fast-refresh).
+### Plant Species Table
+- Cached plant care data from APIs
+- Watering frequency, light requirements
+- Care instructions and tips
 
-When you want to forcefully reload, for example to reset the state of your app, you can perform a full reload:
+### Watering Records Table
+- Complete watering history for each plant
+- Notes and observations
+- Used for tracking and analytics
 
-- **Android**: Press the <kbd>R</kbd> key twice or select **"Reload"** from the **Dev Menu**, accessed via <kbd>Ctrl</kbd> + <kbd>M</kbd> (Windows/Linux) or <kbd>Cmd ⌘</kbd> + <kbd>M</kbd> (macOS).
-- **iOS**: Press <kbd>R</kbd> in iOS Simulator.
+## Development Status
 
-## Congratulations! :tada:
+### Completed ✅
+- [x] Project setup and basic structure
+- [x] Navigation system (tabs + stack)
+- [x] SQLite database schema and services
+- [x] TypeScript type definitions
+- [x] Basic screen scaffolding
 
-You've successfully run and modified your React Native App. :partying_face:
+### In Progress 🚧
+- [ ] Plant list screen with CRUD operations
+- [ ] Add plant form with photo capture
+- [ ] Plant species search and selection
+- [ ] Plant detail view with care information
 
-### Now what?
+### Planned 📋
+- [ ] Watering log functionality
+- [ ] Push notifications for reminders
+- [ ] Plant care API integration (Perenual)
+- [ ] Weather-based care adjustments
+- [ ] Plant health tracking
+- [ ] Export and backup features
 
-- If you want to add this new React Native code to an existing application, check out the [Integration guide](https://reactnative.dev/docs/integration-with-existing-apps).
-- If you're curious to learn more about React Native, check out the [docs](https://reactnative.dev/docs/getting-started).
+## Contributing
 
-# Troubleshooting
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
-If you're having issues getting the above steps to work, see the [Troubleshooting](https://reactnative.dev/docs/troubleshooting) page.
+## License
 
-# Learn More
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-To learn more about React Native, take a look at the following resources:
+## Acknowledgments
 
-- [React Native Website](https://reactnative.dev) - learn more about React Native.
-- [Getting Started](https://reactnative.dev/docs/environment-setup) - an **overview** of React Native and how setup your environment.
-- [Learn the Basics](https://reactnative.dev/docs/getting-started) - a **guided tour** of the React Native **basics**.
-- [Blog](https://reactnative.dev/blog) - read the latest official React Native **Blog** posts.
-- [`@facebook/react-native`](https://github.com/facebook/react-native) - the Open Source; GitHub **repository** for React Native.
+- Plant care data provided by [Perenual API](https://perenual.com/)
+- Icons and UI inspiration from the plant care community
