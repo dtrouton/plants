@@ -106,7 +106,7 @@ const AddPlantScreen: React.FC<AddPlantScreenProps> = ({navigation}) => {
 
     try {
       setSaving(true);
-      
+
       const newPlant = {
         name: plantName.trim(),
         species_id: selectedSpecies?.id,
@@ -117,7 +117,7 @@ const AddPlantScreen: React.FC<AddPlantScreenProps> = ({navigation}) => {
       };
 
       await DatabaseService.createPlant(newPlant);
-      
+
       Alert.alert('Success', 'Plant added successfully!', [
         {
           text: 'OK',
@@ -143,13 +143,13 @@ const AddPlantScreen: React.FC<AddPlantScreenProps> = ({navigation}) => {
   };
 
   return (
-    <KeyboardAvoidingView 
+    <KeyboardAvoidingView
       style={styles.container}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         <View style={styles.content}>
           <Text style={styles.title}>Add New Plant</Text>
-          
+
           {/* Photo Section */}
           <View style={styles.photoSection}>
             <Text style={styles.sectionTitle}>Photo</Text>

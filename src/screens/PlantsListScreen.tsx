@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useCallback} from 'react';
+import React, {useState, useCallback} from 'react';
 import {
   View,
   Text,
@@ -11,6 +11,7 @@ import {
 import {useFocusEffect} from '@react-navigation/native';
 import DatabaseService from '../database/DatabaseService';
 import {Plant} from '../types/Plant';
+import { formatDate, getDaysAgo, needsWatering } from '../utils/dateUtils';
 
 interface PlantsListScreenProps {
   navigation: any;
@@ -66,24 +67,9 @@ const PlantsListScreen: React.FC<PlantsListScreenProps> = ({navigation}) => {
     );
   };
 
-  const formatDate = (dateString?: string) => {
-    if (!dateString) return 'Never';
-    const date = new Date(dateString);
-    return date.toLocaleDateString();
-  };
-
-  const getDaysAgo = (dateString?: string) => {
-    if (!dateString) return null;
-    const date = new Date(dateString);
-    const today = new Date();
-    const diffTime = today.getTime() - date.getTime();
-    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-    return diffDays;
-  };
 
   const renderPlantItem = ({item}: {item: Plant}) => {
-    const daysAgo = getDaysAgo(item.last_watered);
-    const needsWatering = daysAgo === null || daysAgo > 7; // Simple rule for now
+    const plantNeedsWatering = needsWatering(item.last_watered);
 
     return (
       <TouchableOpacity
@@ -99,19 +85,19 @@ const PlantsListScreen: React.FC<PlantsListScreenProps> = ({navigation}) => {
             </View>
           )}
         </View>
-        
+
         <View style={styles.plantInfo}>
           <Text style={styles.plantName}>{item.name}</Text>
           {item.species_name && (
             <Text style={styles.speciesName}>{item.species_name}</Text>
           )}
           <Text style={styles.location}>{item.location}</Text>
-          
+
           <View style={styles.wateringInfo}>
             <Text style={styles.lastWatered}>
               Last watered: {formatDate(item.last_watered)}
             </Text>
-            {needsWatering && (
+            {plantNeedsWatering && (
               <View style={styles.needsWateringBadge}>
                 <Text style={styles.needsWateringText}>Needs Water</Text>
               </View>

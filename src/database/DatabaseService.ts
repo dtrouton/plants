@@ -23,7 +23,7 @@ class DatabaseService {
   }
 
   private async createTables(): Promise<void> {
-    if (!this.db) throw new Error('Database not initialized');
+    if (!this.db) {throw new Error('Database not initialized');}
 
     const createPlantsTable = `
       CREATE TABLE IF NOT EXISTS plants (
@@ -68,7 +68,7 @@ class DatabaseService {
 
   // Plant CRUD operations
   async createPlant(plant: Omit<Plant, 'id'>): Promise<number> {
-    if (!this.db) throw new Error('Database not initialized');
+    if (!this.db) {throw new Error('Database not initialized');}
 
     const query = `
       INSERT INTO plants (name, species_id, species_name, photo_uri, location, created_date, last_watered)
@@ -89,21 +89,21 @@ class DatabaseService {
   }
 
   async getAllPlants(): Promise<Plant[]> {
-    if (!this.db) throw new Error('Database not initialized');
+    if (!this.db) {throw new Error('Database not initialized');}
 
     const query = 'SELECT * FROM plants ORDER BY created_date DESC';
     const result = await this.db.executeSql(query);
-    
+
     const plants: Plant[] = [];
     for (let i = 0; i < result[0].rows.length; i++) {
       plants.push(result[0].rows.item(i));
     }
-    
+
     return plants;
   }
 
   async updatePlant(id: number, plant: Partial<Plant>): Promise<void> {
-    if (!this.db) throw new Error('Database not initialized');
+    if (!this.db) {throw new Error('Database not initialized');}
 
     const fields = Object.keys(plant).filter(key => key !== 'id');
     const setClause = fields.map(field => `${field} = ?`).join(', ');
@@ -114,7 +114,7 @@ class DatabaseService {
   }
 
   async deletePlant(id: number): Promise<void> {
-    if (!this.db) throw new Error('Database not initialized');
+    if (!this.db) {throw new Error('Database not initialized');}
 
     const query = 'DELETE FROM plants WHERE id = ?';
     await this.db.executeSql(query, [id]);
@@ -122,7 +122,7 @@ class DatabaseService {
 
   // Watering record operations
   async addWateringRecord(record: Omit<WateringRecord, 'id'>): Promise<number> {
-    if (!this.db) throw new Error('Database not initialized');
+    if (!this.db) {throw new Error('Database not initialized');}
 
     const query = `
       INSERT INTO watering_records (plant_id, watered_date, notes)
@@ -142,22 +142,22 @@ class DatabaseService {
   }
 
   async getWateringRecords(plantId: number): Promise<WateringRecord[]> {
-    if (!this.db) throw new Error('Database not initialized');
+    if (!this.db) {throw new Error('Database not initialized');}
 
     const query = 'SELECT * FROM watering_records WHERE plant_id = ? ORDER BY watered_date DESC';
     const result = await this.db.executeSql(query, [plantId]);
-    
+
     const records: WateringRecord[] = [];
     for (let i = 0; i < result[0].rows.length; i++) {
       records.push(result[0].rows.item(i));
     }
-    
+
     return records;
   }
 
   // Plant species operations
   async createPlantSpecies(species: Omit<PlantSpecies, 'species_id'>): Promise<number> {
-    if (!this.db) throw new Error('Database not initialized');
+    if (!this.db) {throw new Error('Database not initialized');}
 
     const query = `
       INSERT INTO plant_species (common_name, scientific_name, watering_frequency, light_requirements, care_instructions, cached_date)
@@ -177,7 +177,7 @@ class DatabaseService {
   }
 
   async searchPlantSpecies(searchTerm: string): Promise<PlantSpecies[]> {
-    if (!this.db) throw new Error('Database not initialized');
+    if (!this.db) {throw new Error('Database not initialized');}
 
     const query = `
       SELECT * FROM plant_species 
@@ -186,12 +186,12 @@ class DatabaseService {
     `;
 
     const result = await this.db.executeSql(query, [`%${searchTerm}%`, `%${searchTerm}%`]);
-    
+
     const species: PlantSpecies[] = [];
     for (let i = 0; i < result[0].rows.length; i++) {
       species.push(result[0].rows.item(i));
     }
-    
+
     return species;
   }
 

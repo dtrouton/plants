@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useCallback} from 'react';
 import {
   View,
   Text,
@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 import PlantAPIService, {PlantSpeciesAPI} from '../services/PlantAPIService';
 import DatabaseService from '../database/DatabaseService';
+import { SEARCH_DEBOUNCE_MS } from '../constants/api';
 
 interface PlantSpeciesSearchProps {
   onSelectSpecies: (species: {
@@ -43,19 +44,19 @@ const PlantSpeciesSearch: React.FC<PlantSpeciesSearchProps> = ({
         setSearchResults([]);
         setShowResults(false);
       }
-    }, 500); // Debounce search by 500ms
+    }, SEARCH_DEBOUNCE_MS);
 
     return () => clearTimeout(delayedSearch);
-  }, [searchQuery]);
+  }, [searchQuery, performSearch]);
 
-  const performSearch = async () => {
+  const performSearch = useCallback(async () => {
     try {
       setLoading(true);
       setShowResults(true);
-      
+
       // First check local database for cached species
       const cachedSpecies = await DatabaseService.searchPlantSpecies(searchQuery);
-      
+
       if (cachedSpecies.length > 0) {
         // Convert cached species to API format for consistency
         const convertedSpecies: PlantSpeciesAPI[] = cachedSpecies.map(species => ({
@@ -78,12 +79,12 @@ const PlantSpeciesSearch: React.FC<PlantSpeciesSearchProps> = ({
     } finally {
       setLoading(false);
     }
-  };
+  }, [searchQuery]);
 
   const handleSelectSpecies = async (species: PlantSpeciesAPI) => {
     try {
       setLoading(true);
-      
+
       // Get detailed information from API
       let detailedInfo;
       try {
@@ -93,7 +94,7 @@ const PlantSpeciesSearch: React.FC<PlantSpeciesSearchProps> = ({
         detailedInfo = null;
       }
 
-      const wateringFrequency = detailedInfo 
+      const wateringFrequency = detailedInfo
         ? PlantAPIService.convertWateringToDays(detailedInfo.watering)
         : PlantAPIService.convertWateringToDays(species.watering);
 
@@ -148,12 +149,12 @@ const PlantSpeciesSearch: React.FC<PlantSpeciesSearchProps> = ({
   };
 
   const renderSpeciesItem = ({item}: {item: PlantSpeciesAPI}) => (
-    <TouchableOpacity 
+    <TouchableOpacity
       style={styles.speciesItem}
       onPress={() => handleSelectSpecies(item)}>
       {item.default_image?.medium_url ? (
-        <Image 
-          source={{uri: item.default_image.medium_url}} 
+        <Image
+          source={{uri: item.default_image.medium_url}}
           style={styles.speciesImage}
         />
       ) : (
@@ -161,7 +162,7 @@ const PlantSpeciesSearch: React.FC<PlantSpeciesSearchProps> = ({
           <Text style={styles.placeholderText}>🌱</Text>
         </View>
       )}
-      
+
       <View style={styles.speciesInfo}>
         <Text style={styles.speciesName}>{item.common_name}</Text>
         {item.scientific_name && item.scientific_name.length > 0 && (
@@ -201,7 +202,7 @@ const PlantSpeciesSearch: React.FC<PlantSpeciesSearchProps> = ({
         placeholder="Search for plant species..."
         placeholderTextColor="#bbb"
       />
-      
+
       {showResults && (
         <View style={styles.resultsContainer}>
           {loading ? (

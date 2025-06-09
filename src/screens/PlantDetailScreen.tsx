@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useCallback} from 'react';
 import {
   View,
   Text,
@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 import DatabaseService from '../database/DatabaseService';
 import {Plant, WateringRecord, PlantSpecies} from '../types/Plant';
+import { formatDate, formatDateTime, getDaysAgo, needsWatering } from '../utils/dateUtils';
 
 interface PlantDetailScreenProps {
   route: {
@@ -27,15 +28,11 @@ interface CareInformationSectionProps {
   speciesId: number;
 }
 
-const CareInformationSection: React.FC<CareInformationSectionProps> = ({plantId, speciesId}) => {
+const CareInformationSection: React.FC<CareInformationSectionProps> = ({speciesId}) => {
   const [speciesInfo, setSpeciesInfo] = useState<PlantSpecies | null>(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    loadSpeciesInfo();
-  }, [speciesId]);
-
-  const loadSpeciesInfo = async () => {
+  const loadSpeciesInfo = useCallback(async () => {
     try {
       setLoading(true);
       // Get species info from database
@@ -47,7 +44,11 @@ const CareInformationSection: React.FC<CareInformationSectionProps> = ({plantId,
     } finally {
       setLoading(false);
     }
-  };
+  }, [speciesId]);
+
+  useEffect(() => {
+    loadSpeciesInfo();
+  }, [loadSpeciesInfo]);
 
   if (loading) {
     return (
@@ -65,21 +66,21 @@ const CareInformationSection: React.FC<CareInformationSectionProps> = ({plantId,
   return (
     <View style={styles.section}>
       <Text style={styles.sectionTitle}>Care Information</Text>
-      
+
       {speciesInfo.watering_frequency && (
         <View style={styles.careItem}>
           <Text style={styles.careLabel}>💧 Watering Frequency:</Text>
           <Text style={styles.careValue}>Every {speciesInfo.watering_frequency} days</Text>
         </View>
       )}
-      
+
       {speciesInfo.light_requirements && (
         <View style={styles.careItem}>
           <Text style={styles.careLabel}>☀️ Light Requirements:</Text>
           <Text style={styles.careValue}>{speciesInfo.light_requirements}</Text>
         </View>
       )}
-      
+
       {speciesInfo.care_instructions && (
         <View style={styles.careItem}>
           <Text style={styles.careLabel}>📝 Care Instructions:</Text>
@@ -98,11 +99,7 @@ const PlantDetailScreen: React.FC<PlantDetailScreenProps> = ({route, navigation}
   const [wateringNotes, setWateringNotes] = useState('');
   const [watering, setWatering] = useState(false);
 
-  useEffect(() => {
-    loadWateringRecords();
-  }, []);
-
-  const loadWateringRecords = async () => {
+  const loadWateringRecords = useCallback(async () => {
     try {
       setLoading(true);
       const records = await DatabaseService.getWateringRecords(plant.id);
@@ -113,13 +110,17 @@ const PlantDetailScreen: React.FC<PlantDetailScreenProps> = ({route, navigation}
     } finally {
       setLoading(false);
     }
-  };
+  }, [plant.id]);
+
+  useEffect(() => {
+    loadWateringRecords();
+  }, [loadWateringRecords]);
 
   const handleQuickWater = async () => {
     try {
       setWatering(true);
       const wateringDate = new Date().toISOString();
-      
+
       await DatabaseService.addWateringRecord({
         plant_id: plant.id,
         watered_date: wateringDate,
@@ -128,10 +129,10 @@ const PlantDetailScreen: React.FC<PlantDetailScreenProps> = ({route, navigation}
 
       // Update local plant state
       setPlant(prev => ({...prev, last_watered: wateringDate}));
-      
+
       // Reload watering records
       await loadWateringRecords();
-      
+
       Alert.alert('Success', 'Plant watered successfully! 💧');
     } catch (error) {
       console.error('Error recording watering:', error);
@@ -145,7 +146,7 @@ const PlantDetailScreen: React.FC<PlantDetailScreenProps> = ({route, navigation}
     try {
       setWatering(true);
       const wateringDate = new Date().toISOString();
-      
+
       await DatabaseService.addWateringRecord({
         plant_id: plant.id,
         watered_date: wateringDate,
@@ -154,10 +155,10 @@ const PlantDetailScreen: React.FC<PlantDetailScreenProps> = ({route, navigation}
 
       // Update local plant state
       setPlant(prev => ({...prev, last_watered: wateringDate}));
-      
+
       // Reload watering records
       await loadWateringRecords();
-      
+
       setShowWateringModal(false);
       setWateringNotes('');
       Alert.alert('Success', 'Watering logged successfully! 💧');
@@ -169,24 +170,6 @@ const PlantDetailScreen: React.FC<PlantDetailScreenProps> = ({route, navigation}
     }
   };
 
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString();
-  };
-
-  const formatDateTime = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleString();
-  };
-
-  const getDaysAgo = (dateString?: string) => {
-    if (!dateString) return null;
-    const date = new Date(dateString);
-    const today = new Date();
-    const diffTime = today.getTime() - date.getTime();
-    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-    return diffDays;
-  };
 
   const handleDeletePlant = () => {
     Alert.alert(
@@ -212,7 +195,7 @@ const PlantDetailScreen: React.FC<PlantDetailScreenProps> = ({route, navigation}
   };
 
   const daysAgo = getDaysAgo(plant.last_watered);
-  const needsWatering = daysAgo === null || daysAgo > 7;
+  const plantNeedsWatering = needsWatering(plant.last_watered);
 
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
@@ -225,7 +208,7 @@ const PlantDetailScreen: React.FC<PlantDetailScreenProps> = ({route, navigation}
             <Text style={styles.placeholderText}>🌱</Text>
           </View>
         )}
-        
+
         <View style={styles.plantInfo}>
           <Text style={styles.plantName}>{plant.name}</Text>
           {plant.species_name && (
@@ -253,8 +236,8 @@ const PlantDetailScreen: React.FC<PlantDetailScreenProps> = ({route, navigation}
               </Text>
             )}
           </View>
-          
-          {needsWatering && (
+
+          {plantNeedsWatering && (
             <View style={styles.needsWateringBadge}>
               <Text style={styles.needsWateringText}>Needs Water!</Text>
             </View>
@@ -271,7 +254,7 @@ const PlantDetailScreen: React.FC<PlantDetailScreenProps> = ({route, navigation}
               {watering ? 'Watering...' : '💧 Water Now'}
             </Text>
           </TouchableOpacity>
-          
+
           <TouchableOpacity
             style={[styles.button, styles.secondaryButton]}
             onPress={() => setShowWateringModal(true)}
@@ -334,7 +317,7 @@ const PlantDetailScreen: React.FC<PlantDetailScreenProps> = ({route, navigation}
               <Text style={styles.modalCloseText}>Cancel</Text>
             </TouchableOpacity>
           </View>
-          
+
           <View style={styles.modalContent}>
             <Text style={styles.modalLabel}>Notes (Optional)</Text>
             <TextInput
@@ -345,7 +328,7 @@ const PlantDetailScreen: React.FC<PlantDetailScreenProps> = ({route, navigation}
               multiline
               numberOfLines={3}
             />
-            
+
             <TouchableOpacity
               style={[styles.button, styles.primaryButton]}
               onPress={handleWaterWithNotes}

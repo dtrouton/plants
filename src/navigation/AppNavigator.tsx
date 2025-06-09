@@ -13,13 +13,13 @@ const Stack = createStackNavigator();
 const PlantsStackNavigator = () => {
   return (
     <Stack.Navigator>
-      <Stack.Screen 
-        name="PlantsList" 
+      <Stack.Screen
+        name="PlantsList"
         component={PlantsListScreen}
         options={{title: 'My Plants'}}
       />
-      <Stack.Screen 
-        name="PlantDetail" 
+      <Stack.Screen
+        name="PlantDetail"
         component={PlantDetailScreen}
         options={{title: 'Plant Details'}}
       />
@@ -31,16 +31,16 @@ const AppNavigator = () => {
   return (
     <NavigationContainer>
       <Tab.Navigator>
-        <Tab.Screen 
-          name="Plants" 
+        <Tab.Screen
+          name="Plants"
           component={PlantsStackNavigator}
           options={{
             headerShown: false,
-            title: 'My Plants'
+            title: 'My Plants',
           }}
         />
-        <Tab.Screen 
-          name="AddPlant" 
+        <Tab.Screen
+          name="AddPlant"
           component={AddPlantScreen}
           options={{title: 'Add Plant'}}
         />

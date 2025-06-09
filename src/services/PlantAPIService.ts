@@ -1,8 +1,6 @@
 import axios from 'axios';
-
-// Perenual API configuration
-const PERENUAL_API_KEY = 'sk-NXyN675e25e05f8bb7945'; // Free tier API key
-const PERENUAL_BASE_URL = 'https://perenual.com/api';
+import { PERENUAL_API_KEY, PERENUAL_BASE_URL, API_TIMEOUT } from '../constants/api';
+import { convertWateringToDays, formatSunlight } from '../utils/plantUtils';
 
 export interface PlantSpeciesAPI {
   id: number;
@@ -119,7 +117,7 @@ class PlantAPIService {
           key: PERENUAL_API_KEY,
           ...params,
         },
-        timeout: 10000, // 10 second timeout
+        timeout: API_TIMEOUT,
       });
 
       return response.data;
@@ -163,45 +161,12 @@ class PlantAPIService {
 
   // Convert API watering info to days
   convertWateringToDays(watering?: string): number | null {
-    if (!watering) return null;
-    
-    const lowerWatering = watering.toLowerCase();
-    
-    // Map common watering frequencies to days
-    if (lowerWatering.includes('daily') || lowerWatering.includes('every day')) {
-      return 1;
-    } else if (lowerWatering.includes('twice a week')) {
-      return 3;
-    } else if (lowerWatering.includes('weekly') || lowerWatering.includes('once a week')) {
-      return 7;
-    } else if (lowerWatering.includes('twice a month') || lowerWatering.includes('biweekly')) {
-      return 14;
-    } else if (lowerWatering.includes('monthly') || lowerWatering.includes('once a month')) {
-      return 30;
-    } else if (lowerWatering.includes('rarely') || lowerWatering.includes('infrequent')) {
-      return 60;
-    } else if (lowerWatering.includes('minimum')) {
-      return 14; // Default for minimum watering
-    } else if (lowerWatering.includes('average')) {
-      return 7; // Default for average watering
-    } else if (lowerWatering.includes('frequent')) {
-      return 3; // Default for frequent watering
-    }
-
-    // Try to extract number of days from text like "every 5 days"
-    const dayMatch = lowerWatering.match(/every\s+(\d+)\s+days?/);
-    if (dayMatch) {
-      return parseInt(dayMatch[1], 10);
-    }
-
-    // Default fallback
-    return 7;
+    return convertWateringToDays(watering);
   }
 
   // Format sunlight requirements
   formatSunlight(sunlight?: string[]): string {
-    if (!sunlight || sunlight.length === 0) return 'Unknown';
-    return sunlight.join(', ');
+    return formatSunlight(sunlight);
   }
 
   // Create care instructions from API data
