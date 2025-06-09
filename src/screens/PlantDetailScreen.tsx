@@ -11,7 +11,7 @@ import {
   Modal,
 } from 'react-native';
 import DatabaseService from '../database/DatabaseService';
-import {Plant, WateringRecord} from '../types/Plant';
+import {Plant, WateringRecord, PlantSpecies} from '../types/Plant';
 
 interface PlantDetailScreenProps {
   route: {
@@ -21,6 +21,74 @@ interface PlantDetailScreenProps {
   };
   navigation: any;
 }
+
+interface CareInformationSectionProps {
+  plantId: number;
+  speciesId: number;
+}
+
+const CareInformationSection: React.FC<CareInformationSectionProps> = ({plantId, speciesId}) => {
+  const [speciesInfo, setSpeciesInfo] = useState<PlantSpecies | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    loadSpeciesInfo();
+  }, [speciesId]);
+
+  const loadSpeciesInfo = async () => {
+    try {
+      setLoading(true);
+      // Get species info from database
+      const species = await DatabaseService.searchPlantSpecies('');
+      const foundSpecies = species.find(s => s.species_id === speciesId);
+      setSpeciesInfo(foundSpecies || null);
+    } catch (error) {
+      console.error('Error loading species info:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Care Information</Text>
+        <Text style={styles.loadingText}>Loading care information...</Text>
+      </View>
+    );
+  }
+
+  if (!speciesInfo) {
+    return null;
+  }
+
+  return (
+    <View style={styles.section}>
+      <Text style={styles.sectionTitle}>Care Information</Text>
+      
+      {speciesInfo.watering_frequency && (
+        <View style={styles.careItem}>
+          <Text style={styles.careLabel}>💧 Watering Frequency:</Text>
+          <Text style={styles.careValue}>Every {speciesInfo.watering_frequency} days</Text>
+        </View>
+      )}
+      
+      {speciesInfo.light_requirements && (
+        <View style={styles.careItem}>
+          <Text style={styles.careLabel}>☀️ Light Requirements:</Text>
+          <Text style={styles.careValue}>{speciesInfo.light_requirements}</Text>
+        </View>
+      )}
+      
+      {speciesInfo.care_instructions && (
+        <View style={styles.careItem}>
+          <Text style={styles.careLabel}>📝 Care Instructions:</Text>
+          <Text style={styles.careInstructions}>{speciesInfo.care_instructions}</Text>
+        </View>
+      )}
+    </View>
+  );
+};
 
 const PlantDetailScreen: React.FC<PlantDetailScreenProps> = ({route, navigation}) => {
   const [plant, setPlant] = useState<Plant>(route.params.plant);
@@ -212,6 +280,11 @@ const PlantDetailScreen: React.FC<PlantDetailScreenProps> = ({route, navigation}
           </TouchableOpacity>
         </View>
       </View>
+
+      {/* Care Information */}
+      {plant.species_id && (
+        <CareInformationSection plantId={plant.id} speciesId={plant.species_id} />
+      )}
 
       {/* Watering History */}
       <View style={styles.section}>
@@ -502,6 +575,25 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     minHeight: 80,
     textAlignVertical: 'top',
+  },
+  careItem: {
+    marginBottom: 16,
+  },
+  careLabel: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: '#2c3e50',
+    marginBottom: 4,
+  },
+  careValue: {
+    fontSize: 14,
+    color: '#7f8c8d',
+    marginBottom: 8,
+  },
+  careInstructions: {
+    fontSize: 14,
+    color: '#7f8c8d',
+    lineHeight: 20,
   },
 });
 

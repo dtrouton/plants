@@ -13,17 +13,27 @@ import {
 } from 'react-native';
 import {launchImageLibrary, launchCamera, ImagePickerResponse, MediaType} from 'react-native-image-picker';
 import DatabaseService from '../database/DatabaseService';
+import PlantSpeciesSearch from '../components/PlantSpeciesSearch';
 
 interface AddPlantScreenProps {
   navigation: any;
 }
 
+interface SelectedSpecies {
+  id: number;
+  common_name: string;
+  scientific_name: string;
+  watering_frequency?: number;
+  light_requirements?: string;
+  care_instructions?: string;
+}
+
 const AddPlantScreen: React.FC<AddPlantScreenProps> = ({navigation}) => {
   const [plantName, setPlantName] = useState('');
-  const [speciesName, setSpeciesName] = useState('');
   const [location, setLocation] = useState('');
   const [photoUri, setPhotoUri] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+  const [selectedSpecies, setSelectedSpecies] = useState<SelectedSpecies | null>(null);
 
   const handleImagePicker = () => {
     Alert.alert(
@@ -79,6 +89,10 @@ const AddPlantScreen: React.FC<AddPlantScreenProps> = ({navigation}) => {
     });
   };
 
+  const handleSpeciesSelect = (species: SelectedSpecies) => {
+    setSelectedSpecies(species);
+  };
+
   const handleSavePlant = async () => {
     if (!plantName.trim()) {
       Alert.alert('Error', 'Please enter a plant name');
@@ -95,7 +109,8 @@ const AddPlantScreen: React.FC<AddPlantScreenProps> = ({navigation}) => {
       
       const newPlant = {
         name: plantName.trim(),
-        species_name: speciesName.trim() || undefined,
+        species_id: selectedSpecies?.id,
+        species_name: selectedSpecies?.common_name,
         photo_uri: photoUri || undefined,
         location: location.trim(),
         created_date: new Date().toISOString(),
@@ -122,9 +137,9 @@ const AddPlantScreen: React.FC<AddPlantScreenProps> = ({navigation}) => {
 
   const resetForm = () => {
     setPlantName('');
-    setSpeciesName('');
     setLocation('');
     setPhotoUri(null);
+    setSelectedSpecies(null);
   };
 
   return (
@@ -163,16 +178,7 @@ const AddPlantScreen: React.FC<AddPlantScreenProps> = ({navigation}) => {
               />
             </View>
 
-            <View style={styles.inputGroup}>
-              <Text style={styles.label}>Species (Optional)</Text>
-              <TextInput
-                style={styles.input}
-                value={speciesName}
-                onChangeText={setSpeciesName}
-                placeholder="e.g., Monstera deliciosa"
-                placeholderTextColor="#bbb"
-              />
-            </View>
+            <PlantSpeciesSearch onSelectSpecies={handleSpeciesSelect} />
 
             <View style={styles.inputGroup}>
               <Text style={styles.label}>Location *</Text>
