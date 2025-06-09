@@ -10,6 +10,49 @@ const mockComponent = (name) => {
   return MockedComponent;
 };
 
+// Special mock for TouchableOpacity that handles disabled state
+const MockTouchableOpacity = (props) => {
+  const { disabled, ...otherProps } = props;
+  const enhancedProps = {
+    ...otherProps,
+    accessibilityState: {
+      ...props.accessibilityState,
+      disabled: disabled === true,
+    },
+  };
+  return React.createElement('TouchableOpacity', enhancedProps, props.children);
+};
+MockTouchableOpacity.displayName = 'MockedTouchableOpacity';
+
+// Special mock for Modal that respects visible prop
+const MockModal = (props) => {
+  const { visible, children, ...otherProps } = props;
+  if (!visible) {
+    return null;
+  }
+  return React.createElement('Modal', otherProps, children);
+};
+MockModal.displayName = 'MockedModal';
+
+// Special mock for FlatList that renders items
+const MockFlatList = (props) => {
+  const { data, renderItem, ListEmptyComponent, keyExtractor } = props;
+  
+  if (!data || data.length === 0) {
+    return ListEmptyComponent ? React.createElement(ListEmptyComponent) : null;
+  }
+  
+  return React.createElement(
+    'View',
+    {},
+    data.map((item, index) => {
+      const key = keyExtractor ? keyExtractor(item, index) : index;
+      return React.createElement('View', { key }, renderItem({ item, index }));
+    })
+  );
+};
+MockFlatList.displayName = 'MockedFlatList';
+
 const mockScrollTo = jest.fn();
 
 module.exports = {
@@ -17,13 +60,13 @@ module.exports = {
   View: mockComponent('View'),
   Text: mockComponent('Text'),
   ScrollView: mockComponent('ScrollView'),
-  TouchableOpacity: mockComponent('TouchableOpacity'),
+  TouchableOpacity: MockTouchableOpacity,
   TouchableHighlight: mockComponent('TouchableHighlight'),
   TouchableWithoutFeedback: mockComponent('TouchableWithoutFeedback'),
   TextInput: mockComponent('TextInput'),
   Image: mockComponent('Image'),
-  FlatList: mockComponent('FlatList'),
-  Modal: mockComponent('Modal'),
+  FlatList: MockFlatList,
+  Modal: MockModal,
   SafeAreaView: mockComponent('SafeAreaView'),
   KeyboardAvoidingView: mockComponent('KeyboardAvoidingView'),
   ActivityIndicator: mockComponent('ActivityIndicator'),

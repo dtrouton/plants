@@ -76,5 +76,6 @@ jest.mock('react-native-gesture-handler', () => {
   };
 });
 
-// Alert is now mocked via __mocks__/react-native.js
-// Access it via require('react-native').__mockAlert in tests if needed
+// Set up global mockAlert for tests
+const { __mockAlert } = require('react-native');
+global.mockAlert = __mockAlert;
