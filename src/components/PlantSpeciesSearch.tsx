@@ -36,19 +36,6 @@ const PlantSpeciesSearch: React.FC<PlantSpeciesSearchProps> = ({
   const [showResults, setShowResults] = useState(false);
   const [selectedSpecies, setSelectedSpecies] = useState<string | null>(null);
 
-  useEffect(() => {
-    const delayedSearch = setTimeout(() => {
-      if (searchQuery.length >= 2) {
-        performSearch();
-      } else {
-        setSearchResults([]);
-        setShowResults(false);
-      }
-    }, SEARCH_DEBOUNCE_MS);
-
-    return () => clearTimeout(delayedSearch);
-  }, [searchQuery, performSearch]);
-
   const performSearch = useCallback(async () => {
     try {
       setLoading(true);
@@ -81,6 +68,19 @@ const PlantSpeciesSearch: React.FC<PlantSpeciesSearchProps> = ({
     }
   }, [searchQuery]);
 
+  useEffect(() => {
+    const delayedSearch = setTimeout(() => {
+      if (searchQuery.length >= 2) {
+        performSearch();
+      } else {
+        setSearchResults([]);
+        setShowResults(false);
+      }
+    }, SEARCH_DEBOUNCE_MS);
+
+    return () => clearTimeout(delayedSearch);
+  }, [searchQuery, performSearch]);
+
   const handleSelectSpecies = async (species: PlantSpeciesAPI) => {
     try {
       setLoading(true);
@@ -110,7 +110,7 @@ const PlantSpeciesSearch: React.FC<PlantSpeciesSearchProps> = ({
         id: species.id,
         common_name: species.common_name,
         scientific_name: species.scientific_name?.[0] || '',
-        watering_frequency: wateringFrequency,
+        watering_frequency: wateringFrequency || undefined,
         light_requirements: lightRequirements,
         care_instructions: careInstructions,
       };
@@ -120,7 +120,7 @@ const PlantSpeciesSearch: React.FC<PlantSpeciesSearchProps> = ({
         await DatabaseService.createPlantSpecies({
           common_name: selectedSpeciesData.common_name,
           scientific_name: selectedSpeciesData.scientific_name,
-          watering_frequency: selectedSpeciesData.watering_frequency,
+          watering_frequency: selectedSpeciesData.watering_frequency || undefined,
           light_requirements: selectedSpeciesData.light_requirements,
           care_instructions: selectedSpeciesData.care_instructions,
           cached_date: new Date().toISOString(),

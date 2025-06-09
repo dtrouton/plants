@@ -56,7 +56,7 @@ const AddPlantScreen: React.FC<AddPlantScreenProps> = ({navigation}) => {
   const openCamera = () => {
     const options = {
       mediaType: 'photo' as MediaType,
-      quality: 0.7,
+      quality: 0.7 as const,
       maxWidth: 800,
       maxHeight: 800,
     };
@@ -74,7 +74,7 @@ const AddPlantScreen: React.FC<AddPlantScreenProps> = ({navigation}) => {
   const openImageLibrary = () => {
     const options = {
       mediaType: 'photo' as MediaType,
-      quality: 0.7,
+      quality: 0.7 as const,
       maxWidth: 800,
       maxHeight: 800,
     };
