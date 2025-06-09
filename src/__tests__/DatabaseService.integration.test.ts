@@ -196,4 +196,37 @@ describe('DatabaseService Integration', () => {
       await expect(DatabaseService.getAllPlants()).rejects.toThrow('Database not initialized');
     });
   });
+
+  describe('Database Lifecycle', () => {
+    it('should handle initialization errors', async () => {
+      const consoleError = jest.spyOn(console, 'error').mockImplementation();
+      const SQLite = require('react-native-sqlite-storage');
+
+      // Make openDatabase fail
+      SQLite.openDatabase.mockRejectedValueOnce(new Error('Failed to open database'));
+
+      await expect(DatabaseService.init()).rejects.toThrow('Failed to open database');
+      expect(consoleError).toHaveBeenCalledWith('Database initialization failed:', expect.any(Error));
+
+      consoleError.mockRestore();
+    });
+
+    it('should close database connection', async () => {
+      // Set up a database connection
+      (DatabaseService as any).db = mockDatabase;
+
+      await DatabaseService.close();
+
+      expect(mockClose).toHaveBeenCalled();
+      expect((DatabaseService as any).db).toBeNull();
+    });
+
+    it('should handle close when no database connection exists', async () => {
+      (DatabaseService as any).db = null;
+
+      await DatabaseService.close();
+
+      expect(mockClose).not.toHaveBeenCalled();
+    });
+  });
 });

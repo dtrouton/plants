@@ -450,4 +450,173 @@ describe('PlantDetailScreen', () => {
       expect(__mockAlert).toHaveBeenCalledWith('Success', 'Watering logged successfully! 💧');
     });
   });
+
+  it('should handle error when loading watering records fails', async () => {
+    const consoleError = jest.spyOn(console, 'error').mockImplementation();
+    mockedDatabaseService.getWateringRecords.mockRejectedValue(new Error('Database error'));
+
+    render(
+      <PlantDetailScreen route={mockRoute} navigation={mockNavigation} />
+    );
+
+    await waitFor(() => {
+      expect(__mockAlert).toHaveBeenCalledWith('Error', 'Failed to load watering history');
+    });
+
+    expect(consoleError).toHaveBeenCalledWith('Error loading watering records:', expect.any(Error));
+    consoleError.mockRestore();
+  });
+
+  it('should handle error when quick watering fails', async () => {
+    const consoleError = jest.spyOn(console, 'error').mockImplementation();
+    mockedDatabaseService.addWateringRecord.mockRejectedValue(new Error('Database error'));
+
+    const { getByText } = render(
+      <PlantDetailScreen route={mockRoute} navigation={mockNavigation} />
+    );
+
+    const waterButton = getByText('💧 Water Now');
+    fireEvent.press(waterButton);
+
+    await waitFor(() => {
+      expect(__mockAlert).toHaveBeenCalledWith('Error', 'Failed to record watering');
+    });
+
+    expect(consoleError).toHaveBeenCalledWith('Error recording watering:', expect.any(Error));
+    consoleError.mockRestore();
+  });
+
+  it('should handle error when watering with notes fails', async () => {
+    const consoleError = jest.spyOn(console, 'error').mockImplementation();
+    mockedDatabaseService.addWateringRecord.mockRejectedValue(new Error('Database error'));
+
+    const { getByText, getByPlaceholderText } = render(
+      <PlantDetailScreen route={mockRoute} navigation={mockNavigation} />
+    );
+
+    // Open modal
+    const waterWithNotesButton = getByText('Water with Notes');
+    fireEvent.press(waterWithNotesButton);
+
+    await waitFor(() => {
+      expect(getByText('Log Watering')).toBeTruthy();
+    });
+
+    // Add notes and submit
+    const notesInput = getByPlaceholderText('e.g., Soil was dry, gave extra water...');
+    fireEvent.changeText(notesInput, 'Test notes');
+
+    const logWateringButton = getByText('💧 Log Watering');
+    fireEvent.press(logWateringButton);
+
+    await waitFor(() => {
+      expect(__mockAlert).toHaveBeenCalledWith('Error', 'Failed to record watering');
+    });
+
+    expect(consoleError).toHaveBeenCalledWith('Error recording watering:', expect.any(Error));
+    consoleError.mockRestore();
+  });
+
+  it('should handle error when deleting plant fails', async () => {
+    const consoleError = jest.spyOn(console, 'error').mockImplementation();
+    mockedDatabaseService.deletePlant.mockRejectedValue(new Error('Database error'));
+
+    const { getByText } = render(
+      <PlantDetailScreen route={mockRoute} navigation={mockNavigation} />
+    );
+
+    const deleteButton = getByText('Delete Plant');
+    fireEvent.press(deleteButton);
+
+    await waitFor(() => {
+      expect(__mockAlert).toHaveBeenCalledWith(
+        'Delete Plant',
+        expect.stringContaining('Are you sure you want to delete'),
+        expect.any(Array)
+      );
+    });
+
+    // Get the delete confirmation and press delete
+    const deleteAlert = __mockAlert.mock.calls.find((call: any) => call[0] === 'Delete Plant');
+    const deleteConfirmButton = deleteAlert[2].find((button: any) => button.text === 'Delete');
+
+    // Execute the delete action
+    await deleteConfirmButton.onPress();
+
+    await waitFor(() => {
+      expect(__mockAlert).toHaveBeenCalledWith('Error', 'Failed to delete plant');
+    });
+
+    expect(consoleError).toHaveBeenCalledWith('Error deleting plant:', expect.any(Error));
+    consoleError.mockRestore();
+  });
+
+  it('should successfully delete plant and navigate back', async () => {
+    const { getByText } = render(
+      <PlantDetailScreen route={mockRoute} navigation={mockNavigation} />
+    );
+
+    const deleteButton = getByText('Delete Plant');
+    fireEvent.press(deleteButton);
+
+    await waitFor(() => {
+      expect(__mockAlert).toHaveBeenCalledWith(
+        'Delete Plant',
+        expect.stringContaining('Are you sure you want to delete'),
+        expect.any(Array)
+      );
+    });
+
+    // Get the delete confirmation and press delete
+    const deleteAlert = __mockAlert.mock.calls.find((call: any) => call[0] === 'Delete Plant');
+    const deleteConfirmButton = deleteAlert[2].find((button: any) => button.text === 'Delete');
+
+    // Execute the delete action
+    await deleteConfirmButton.onPress();
+
+    await waitFor(() => {
+      expect(mockedDatabaseService.deletePlant).toHaveBeenCalledWith(1);
+      expect(mockNavigation.goBack).toHaveBeenCalled();
+    });
+  });
+
+  it('should handle cancel in delete confirmation dialog', async () => {
+    const { getByText } = render(
+      <PlantDetailScreen route={mockRoute} navigation={mockNavigation} />
+    );
+
+    const deleteButton = getByText('Delete Plant');
+    fireEvent.press(deleteButton);
+
+    await waitFor(() => {
+      expect(__mockAlert).toHaveBeenCalledWith(
+        'Delete Plant',
+        expect.stringContaining('Are you sure you want to delete'),
+        expect.any(Array)
+      );
+    });
+
+    // Get the delete confirmation and press cancel
+    const deleteAlert = __mockAlert.mock.calls.find((call: any) => call[0] === 'Delete Plant');
+    const cancelButton = deleteAlert[2].find((button: any) => button.text === 'Cancel');
+
+    // Verify cancel button exists but don't need to execute it
+    expect(cancelButton.style).toBe('cancel');
+    expect(mockedDatabaseService.deletePlant).not.toHaveBeenCalled();
+  });
+
+  it('should handle error when loading species info fails', async () => {
+    const consoleError = jest.spyOn(console, 'error').mockImplementation();
+    mockedDatabaseService.searchPlantSpecies.mockRejectedValue(new Error('Database error'));
+
+    const { } = render(
+      <PlantDetailScreen route={mockRoute} navigation={mockNavigation} />
+    );
+
+    await waitFor(() => {
+      expect(consoleError).toHaveBeenCalledWith('Error loading species info:', expect.any(Error));
+    });
+
+    consoleError.mockRestore();
+  });
 });

@@ -272,4 +272,166 @@ describe('PlantSpeciesSearch', () => {
       expect(getByPlaceholderText('Search for plant species...')).toBeTruthy();
     });
   });
+
+  it('should handle getPlantDetails failure during species selection', async () => {
+    const consoleWarn = jest.spyOn(console, 'warn').mockImplementation();
+    const mockSpecies = {
+      id: 1,
+      common_name: 'Test Plant',
+      scientific_name: ['Testus plantus'],
+      watering: 'Weekly',
+      sunlight: ['Bright light'],
+    };
+
+    mockedDatabaseService.searchPlantSpecies.mockResolvedValue([]);
+    mockedPlantAPIService.searchPlants.mockResolvedValue({
+      data: [mockSpecies],
+      total: 1,
+      per_page: 30,
+      current_page: 1,
+      from: 1,
+      last_page: 1,
+      to: 1,
+    });
+
+    // Make getPlantDetails fail
+    mockedPlantAPIService.getPlantDetails.mockRejectedValue(new Error('Details API Error'));
+    mockedPlantAPIService.createCareInstructions.mockReturnValue('Care instructions');
+
+    const { convertWateringToDays, formatSunlight } = require('../../utils/plantUtils');
+    convertWateringToDays.mockReturnValue(7);
+    formatSunlight.mockReturnValue('Bright light');
+
+    mockedDatabaseService.createPlantSpecies.mockResolvedValue(1);
+
+    const { getByPlaceholderText, getByText } = render(
+      <PlantSpeciesSearch onSelectSpecies={mockOnSelectSpecies} />
+    );
+
+    const searchInput = getByPlaceholderText('Search for plant species...');
+    fireEvent.changeText(searchInput, 'test');
+
+    jest.advanceTimersByTime(500);
+
+    await waitFor(() => {
+      expect(getByText('Test Plant')).toBeTruthy();
+    });
+
+    // Select the species
+    fireEvent.press(getByText('Test Plant'));
+
+    await waitFor(() => {
+      expect(consoleWarn).toHaveBeenCalledWith('Failed to get detailed info, using basic info:', expect.any(Error));
+      expect(mockOnSelectSpecies).toHaveBeenCalled();
+    });
+
+    consoleWarn.mockRestore();
+  });
+
+  it('should handle caching failure during species selection', async () => {
+    const consoleWarn = jest.spyOn(console, 'warn').mockImplementation();
+    const mockSpecies = {
+      id: 1,
+      common_name: 'Test Plant',
+      scientific_name: ['Testus plantus'],
+      watering: 'Weekly',
+      sunlight: ['Bright light'],
+    };
+
+    mockedDatabaseService.searchPlantSpecies.mockResolvedValue([]);
+    mockedPlantAPIService.searchPlants.mockResolvedValue({
+      data: [mockSpecies],
+      total: 1,
+      per_page: 30,
+      current_page: 1,
+      from: 1,
+      last_page: 1,
+      to: 1,
+    });
+
+    mockedPlantAPIService.getPlantDetails.mockResolvedValue({} as any);
+    mockedPlantAPIService.createCareInstructions.mockReturnValue('Care instructions');
+
+    const { convertWateringToDays, formatSunlight } = require('../../utils/plantUtils');
+    convertWateringToDays.mockReturnValue(7);
+    formatSunlight.mockReturnValue('Bright light');
+
+    // Make caching fail
+    mockedDatabaseService.createPlantSpecies.mockRejectedValue(new Error('Cache error'));
+
+    const { getByPlaceholderText, getByText } = render(
+      <PlantSpeciesSearch onSelectSpecies={mockOnSelectSpecies} />
+    );
+
+    const searchInput = getByPlaceholderText('Search for plant species...');
+    fireEvent.changeText(searchInput, 'test');
+
+    jest.advanceTimersByTime(500);
+
+    await waitFor(() => {
+      expect(getByText('Test Plant')).toBeTruthy();
+    });
+
+    // Select the species
+    fireEvent.press(getByText('Test Plant'));
+
+    await waitFor(() => {
+      expect(consoleWarn).toHaveBeenCalledWith('Failed to cache species:', expect.any(Error));
+      expect(mockOnSelectSpecies).toHaveBeenCalled();
+    });
+
+    consoleWarn.mockRestore();
+  });
+
+  it('should handle species selection errors', async () => {
+    const consoleError = jest.spyOn(console, 'error').mockImplementation();
+    const mockSpecies = {
+      id: 1,
+      common_name: 'Test Plant',
+      scientific_name: ['Testus plantus'],
+      watering: 'Weekly',
+      sunlight: ['Bright light'],
+    };
+
+    mockedDatabaseService.searchPlantSpecies.mockResolvedValue([]);
+    mockedPlantAPIService.searchPlants.mockResolvedValue({
+      data: [mockSpecies],
+      total: 1,
+      per_page: 30,
+      current_page: 1,
+      from: 1,
+      last_page: 1,
+      to: 1,
+    });
+
+    mockedPlantAPIService.getPlantDetails.mockResolvedValue({} as any);
+
+    // Make convertWateringToDays throw an error to trigger the outer catch block
+    const { convertWateringToDays } = require('../../utils/plantUtils');
+    convertWateringToDays.mockImplementation(() => {
+      throw new Error('Conversion error');
+    });
+
+    const { getByPlaceholderText, getByText } = render(
+      <PlantSpeciesSearch onSelectSpecies={mockOnSelectSpecies} />
+    );
+
+    const searchInput = getByPlaceholderText('Search for plant species...');
+    fireEvent.changeText(searchInput, 'test');
+
+    jest.advanceTimersByTime(500);
+
+    await waitFor(() => {
+      expect(getByText('Test Plant')).toBeTruthy();
+    });
+
+    // Select the species
+    fireEvent.press(getByText('Test Plant'));
+
+    await waitFor(() => {
+      expect(consoleError).toHaveBeenCalledWith('Error selecting species:', expect.any(Error));
+    });
+
+    consoleError.mockRestore();
+  });
 });
