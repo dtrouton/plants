@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { PERENUAL_API_KEY, PERENUAL_BASE_URL, API_TIMEOUT } from '../constants/api';
-import { convertWateringToDays, formatSunlight } from '../utils/plantUtils';
+import { formatSunlight } from '../utils/plantUtils';
 
 export interface PlantSpeciesAPI {
   id: number;

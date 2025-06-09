@@ -2,7 +2,7 @@
  * Format a date string to a localized date
  */
 export const formatDate = (dateString?: string): string => {
-  if (!dateString) return 'Never';
+  if (!dateString) {return 'Never';}
   const date = new Date(dateString);
   return date.toLocaleDateString();
 };
@@ -19,7 +19,7 @@ export const formatDateTime = (dateString: string): string => {
  * Calculate days ago from a date string
  */
 export const getDaysAgo = (dateString?: string): number | null => {
-  if (!dateString) return null;
+  if (!dateString) {return null;}
   const date = new Date(dateString);
   const today = new Date();
   const diffTime = today.getTime() - date.getTime();

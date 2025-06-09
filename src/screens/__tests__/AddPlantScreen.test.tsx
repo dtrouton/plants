@@ -17,7 +17,7 @@ const mockedDatabaseService = DatabaseService as jest.Mocked<typeof DatabaseServ
 
 // Mock PlantSpeciesSearch component
 jest.mock('../../components/PlantSpeciesSearch', () => {
-  return function MockPlantSpeciesSearch({ onSelectSpecies }: any) {
+  return function MockPlantSpeciesSearch({ onSelectSpecies: _onSelectSpecies }: any) {
     return null; // We'll test this component separately
   };
 });
@@ -79,7 +79,7 @@ describe('AddPlantScreen', () => {
     // Fill form fields
     const nameInput = getByPlaceholderText('e.g., My Monstera');
     const locationInput = getByPlaceholderText('e.g., Living room window');
-    
+
     fireEvent.changeText(nameInput, 'Test Plant');
     fireEvent.changeText(locationInput, 'Kitchen');
 
@@ -139,13 +139,13 @@ describe('AddPlantScreen', () => {
     );
 
     const nameInput = getByPlaceholderText('e.g., My Monstera');
-    
+
     fireEvent.changeText(nameInput, 'First Name');
     expect(nameInput.props.value).toBe('First Name');
-    
+
     fireEvent.changeText(nameInput, 'Second Name');
     expect(nameInput.props.value).toBe('Second Name');
-    
+
     fireEvent.changeText(nameInput, '');
     expect(nameInput.props.value).toBe('');
   });
@@ -157,13 +157,13 @@ describe('AddPlantScreen', () => {
 
     const nameInput = getByPlaceholderText('e.g., My Monstera');
     const locationInput = getByPlaceholderText('e.g., Living room window');
-    
+
     fireEvent.changeText(nameInput, 'Plant Name');
     fireEvent.changeText(locationInput, 'Plant Location');
 
     expect(nameInput.props.value).toBe('Plant Name');
     expect(locationInput.props.value).toBe('Plant Location');
-    
+
     // Clear only one field
     fireEvent.changeText(nameInput, '');
     expect(nameInput.props.value).toBe('');

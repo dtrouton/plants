@@ -221,7 +221,7 @@ describe('PlantsListScreen', () => {
     const consoleError = jest.spyOn(console, 'error').mockImplementation();
     mockedDatabaseService.getAllPlants.mockRejectedValue(new Error('Database error'));
 
-    const { getByText } = render(
+    render(
       <PlantsListScreen navigation={mockNavigation} />
     );
 
@@ -260,14 +260,14 @@ describe('PlantsListScreen', () => {
     // Get the delete function from the Alert.alert call
     const alertCall = global.mockAlert.mock.calls[0];
     const deleteOption = alertCall[2].find((option: any) => option.text === 'Delete');
-    
+
     // Execute the delete
     if (deleteOption?.onPress) {
       await deleteOption.onPress();
     }
 
     expect(mockedDatabaseService.deletePlant).toHaveBeenCalledWith(1);
-    
+
     // Cleanup
     unmount();
   });
@@ -296,7 +296,7 @@ describe('PlantsListScreen', () => {
 
     const alertCall = global.mockAlert.mock.calls[0];
     const deleteOption = alertCall[2].find((option: any) => option.text === 'Delete');
-    
+
     if (deleteOption?.onPress) {
       await deleteOption.onPress();
     }
@@ -304,10 +304,10 @@ describe('PlantsListScreen', () => {
     await waitFor(() => {
       expect(global.mockAlert).toHaveBeenCalledWith('Error', 'Failed to delete plant');
     });
-    
+
     expect(consoleError).toHaveBeenCalledWith('Error deleting plant:', expect.any(Error));
     consoleError.mockRestore();
-    
+
     // Cleanup
     unmount();
   });

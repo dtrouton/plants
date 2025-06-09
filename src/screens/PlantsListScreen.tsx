@@ -11,7 +11,7 @@ import {
 import {useFocusEffect} from '@react-navigation/native';
 import DatabaseService from '../database/DatabaseService';
 import {Plant} from '../types/Plant';
-import { formatDate, getDaysAgo, needsWatering } from '../utils/dateUtils';
+import { formatDate, needsWatering } from '../utils/dateUtils';
 
 interface PlantsListScreenProps {
   navigation: any;

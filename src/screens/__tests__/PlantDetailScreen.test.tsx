@@ -51,13 +51,13 @@ const mockWateringRecords: WateringRecord[] = [
 
 const mockSpeciesData: PlantSpecies[] = [
   {
-    id: 1,
     species_id: 123,
     common_name: 'Test Species',
     scientific_name: 'Testicus planticus',
     watering_frequency: 7,
     light_requirements: 'Bright indirect light',
     care_instructions: 'Water when soil is dry. Mist occasionally.',
+    cached_date: '2023-01-01T00:00:00.000Z',
   },
 ];
 
@@ -65,11 +65,11 @@ describe('PlantDetailScreen', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockNavigation.goBack.mockClear();
-    
+
     // Default mock implementations
     mockedDatabaseService.getWateringRecords.mockResolvedValue(mockWateringRecords);
     mockedDatabaseService.searchPlantSpecies.mockResolvedValue(mockSpeciesData);
-    mockedDatabaseService.addWateringRecord.mockResolvedValue();
+    mockedDatabaseService.addWateringRecord.mockResolvedValue(1);
     mockedDatabaseService.deletePlant.mockResolvedValue();
   });
 
@@ -89,7 +89,7 @@ describe('PlantDetailScreen', () => {
       ...mockPlant,
       photo_uri: undefined,
     };
-    
+
     const routeWithoutPhoto = {
       params: {
         plant: plantWithoutPhoto,
@@ -280,7 +280,7 @@ describe('PlantDetailScreen', () => {
       ...mockPlant,
       species_id: undefined,
     };
-    
+
     const routeWithoutSpecies = {
       params: {
         plant: plantWithoutSpecies,
@@ -324,7 +324,7 @@ describe('PlantDetailScreen', () => {
       ...mockPlant,
       last_watered: undefined,
     };
-    
+
     const routeNeverWatered = {
       params: {
         plant: plantNeverWatered,
@@ -344,7 +344,7 @@ describe('PlantDetailScreen', () => {
       ...mockPlant,
       last_watered: today,
     };
-    
+
     const routeWateredToday = {
       params: {
         plant: plantWateredToday,
@@ -360,12 +360,12 @@ describe('PlantDetailScreen', () => {
 
   it('should disable buttons during watering operation', async () => {
     let resolveWatering: () => void;
-    const wateringPromise = new Promise<void>((resolve) => {
-      resolveWatering = resolve;
+    const wateringPromise = new Promise<number>((resolve) => {
+      resolveWatering = () => resolve(1);
     });
     mockedDatabaseService.addWateringRecord.mockReturnValue(wateringPromise);
 
-    const { getByText, queryByText } = render(
+    const { getByText } = render(
       <PlantDetailScreen route={mockRoute} navigation={mockNavigation} />
     );
 
@@ -380,13 +380,13 @@ describe('PlantDetailScreen', () => {
     // During watering, the button text should change and show loading state
     // This verifies that the watering state is properly managed
     expect(getByText('Watering...')).toBeTruthy();
-    
+
     // The "Water with Notes" button should still be present
     expect(getByText('Water with Notes')).toBeTruthy();
 
     // Resolve the watering operation
     resolveWatering!();
-    
+
     await waitFor(() => {
       expect(getByText('💧 Water Now')).toBeTruthy(); // Back to normal state
     });

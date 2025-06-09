@@ -1,6 +1,5 @@
 import React from 'react';
 import { render, fireEvent, waitFor } from '@testing-library/react-native';
-import { Alert } from 'react-native';
 import PlantSpeciesSearch from '../PlantSpeciesSearch';
 import PlantAPIService from '../../services/PlantAPIService';
 import DatabaseService from '../../database/DatabaseService';
@@ -12,7 +11,6 @@ jest.mock('../../utils/plantUtils');
 
 const mockedPlantAPIService = PlantAPIService as jest.Mocked<typeof PlantAPIService>;
 const mockedDatabaseService = DatabaseService as jest.Mocked<typeof DatabaseService>;
-const { convertWateringToDays, formatSunlight } = require('../../utils/plantUtils');
 
 describe('PlantSpeciesSearch', () => {
   const mockOnSelectSpecies = jest.fn();
@@ -150,6 +148,8 @@ describe('PlantSpeciesSearch', () => {
     } as any);
 
     mockedPlantAPIService.createCareInstructions.mockReturnValue('Care instructions');
+
+    const { convertWateringToDays, formatSunlight } = require('../../utils/plantUtils');
     convertWateringToDays.mockReturnValue(7);
     formatSunlight.mockReturnValue('Bright light');
 
@@ -220,6 +220,8 @@ describe('PlantSpeciesSearch', () => {
 
     mockedPlantAPIService.getPlantDetails.mockResolvedValue({} as any);
     mockedPlantAPIService.createCareInstructions.mockReturnValue('Instructions');
+
+    const { convertWateringToDays, formatSunlight } = require('../../utils/plantUtils');
     convertWateringToDays.mockReturnValue(7);
     formatSunlight.mockReturnValue('Unknown');
     mockedDatabaseService.createPlantSpecies.mockResolvedValue(1);

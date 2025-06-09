@@ -37,11 +37,11 @@ MockModal.displayName = 'MockedModal';
 // Special mock for FlatList that renders items
 const MockFlatList = (props) => {
   const { data, renderItem, ListEmptyComponent, keyExtractor } = props;
-  
+
   if (!data || data.length === 0) {
     return ListEmptyComponent ? React.createElement(ListEmptyComponent) : null;
   }
-  
+
   return React.createElement(
     'View',
     {},
@@ -70,42 +70,42 @@ module.exports = {
   SafeAreaView: mockComponent('SafeAreaView'),
   KeyboardAvoidingView: mockComponent('KeyboardAvoidingView'),
   ActivityIndicator: mockComponent('ActivityIndicator'),
-  
+
   // StyleSheet
   StyleSheet: {
     create: (styles) => styles,
     flatten: (styles) => styles,
   },
-  
+
   // Alert
   Alert: {
     alert: mockAlert,
   },
-  
+
   // Platform
   Platform: {
     OS: 'ios',
     select: (objs) => objs.ios,
   },
-  
+
   // Dimensions
   Dimensions: {
     get: jest.fn(() => ({ width: 375, height: 667 })),
   },
-  
+
   // Keyboard
   Keyboard: {
     addListener: jest.fn(),
     removeListener: jest.fn(),
     removeAllListeners: jest.fn(),
   },
-  
+
   // BackHandler
   BackHandler: {
     addEventListener: jest.fn(),
     removeEventListener: jest.fn(),
   },
-  
+
   // Linking
   Linking: {
     openURL: jest.fn(),
@@ -113,33 +113,33 @@ module.exports = {
     addEventListener: jest.fn(),
     removeEventListener: jest.fn(),
   },
-  
+
   // PixelRatio
   PixelRatio: {
     get: jest.fn(() => 2),
     getFontScale: jest.fn(() => 1),
   },
-  
+
   // StatusBar
   StatusBar: {
     setBarStyle: jest.fn(),
     setBackgroundColor: jest.fn(),
     setHidden: jest.fn(),
   },
-  
+
   // AppState
   AppState: {
     currentState: 'active',
     addEventListener: jest.fn(),
     removeEventListener: jest.fn(),
   },
-  
+
   // NativeModules
   NativeModules: {},
-  
+
   // findNodeHandle
   findNodeHandle: jest.fn(),
-  
+
   // Global mock alert reference
   __mockAlert: mockAlert,
 };

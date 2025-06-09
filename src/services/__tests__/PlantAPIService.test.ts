@@ -13,7 +13,7 @@ describe('PlantAPIService', () => {
   describe('searchPlants', () => {
     it('should return empty results for empty query', async () => {
       const result = await PlantAPIService.searchPlants('');
-      
+
       expect(result.data).toEqual([]);
       expect(result.total).toBe(0);
       expect(mockedAxios.get).not.toHaveBeenCalled();
@@ -46,11 +46,11 @@ describe('PlantAPIService', () => {
       mockedAxios.get.mockResolvedValue(mockResponse);
 
       const result = await PlantAPIService.searchPlants('test', 2);
-      
+
       expect(result.data).toHaveLength(1);
       expect(result.data[0].common_name).toBe('Test Plant');
       expect(result.total).toBe(1);
-      
+
       expect(mockedAxios.get).toHaveBeenCalledWith(
         `${PERENUAL_BASE_URL}/species-list`,
         {

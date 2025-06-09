@@ -1,0 +1,27 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx react-native:*)",
+      "Bash(npx @react-native-community/cli@latest init:*)",
+      "Bash(npm install:*)",
+      "Bash(mkdir:*)",
+      "Bash(git init:*)",
+      "Bash(git add:*)",
+      "Bash(git remote add:*)",
+      "Bash(git push:*)",
+      "Bash(touch:*)",
+      "Bash(npm test)",
+      "Bash(npm test:*)",
+      "Bash(npm run lint:*)",
+      "Bash(npm run type-check:*)",
+      "Bash(npm run test:coverage:*)",
+      "Bash(rm:*)",
+      "Bash(node:*)",
+      "Bash(grep:*)",
+      "Bash(git rm:*)",
+      "Bash(find:*)",
+      "Bash(git commit:*)"
+    ],
+    "deny": []
+  }
+}
