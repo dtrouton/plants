@@ -8,9 +8,11 @@ import DatabaseService from '../../database/DatabaseService';
 // Mock the services
 jest.mock('../../services/PlantAPIService');
 jest.mock('../../database/DatabaseService');
+jest.mock('../../utils/plantUtils');
 
 const mockedPlantAPIService = PlantAPIService as jest.Mocked<typeof PlantAPIService>;
 const mockedDatabaseService = DatabaseService as jest.Mocked<typeof DatabaseService>;
+const { convertWateringToDays, formatSunlight } = require('../../utils/plantUtils');
 
 describe('PlantSpeciesSearch', () => {
   const mockOnSelectSpecies = jest.fn();
@@ -147,9 +149,9 @@ describe('PlantSpeciesSearch', () => {
       sunlight: ['Bright light'],
     } as any);
 
-    mockedPlantAPIService.convertWateringToDays.mockReturnValue(7);
-    mockedPlantAPIService.formatSunlight.mockReturnValue('Bright light');
     mockedPlantAPIService.createCareInstructions.mockReturnValue('Care instructions');
+    convertWateringToDays.mockReturnValue(7);
+    formatSunlight.mockReturnValue('Bright light');
 
     mockedDatabaseService.createPlantSpecies.mockResolvedValue(1);
 
@@ -217,9 +219,9 @@ describe('PlantSpeciesSearch', () => {
     });
 
     mockedPlantAPIService.getPlantDetails.mockResolvedValue({} as any);
-    mockedPlantAPIService.convertWateringToDays.mockReturnValue(7);
-    mockedPlantAPIService.formatSunlight.mockReturnValue('Unknown');
     mockedPlantAPIService.createCareInstructions.mockReturnValue('Instructions');
+    convertWateringToDays.mockReturnValue(7);
+    formatSunlight.mockReturnValue('Unknown');
     mockedDatabaseService.createPlantSpecies.mockResolvedValue(1);
 
     const searchInput = getByPlaceholderText('Search for plant species...');

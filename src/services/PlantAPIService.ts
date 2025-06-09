@@ -159,15 +159,6 @@ class PlantAPIService {
     return this.makeRequest(`/species/details/${plantId}`);
   }
 
-  // Convert API watering info to days
-  convertWateringToDays(watering?: string): number | null {
-    return convertWateringToDays(watering);
-  }
-
-  // Format sunlight requirements
-  formatSunlight(sunlight?: string[]): string {
-    return formatSunlight(sunlight);
-  }
 
   // Create care instructions from API data
   createCareInstructions(plant: PlantDetailsAPI): string {
@@ -178,7 +169,7 @@ class PlantAPIService {
     }
 
     if (plant.sunlight && plant.sunlight.length > 0) {
-      instructions.push(`☀️ Light: ${this.formatSunlight(plant.sunlight)}`);
+      instructions.push(`☀️ Light: ${formatSunlight(plant.sunlight)}`);
     }
 
     if (plant.soil && plant.soil.length > 0) {

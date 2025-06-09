@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 import PlantAPIService, {PlantSpeciesAPI} from '../services/PlantAPIService';
 import DatabaseService from '../database/DatabaseService';
+import { convertWateringToDays, formatSunlight } from '../utils/plantUtils';
 import { SEARCH_DEBOUNCE_MS } from '../constants/api';
 
 interface PlantSpeciesSearchProps {
@@ -95,12 +96,12 @@ const PlantSpeciesSearch: React.FC<PlantSpeciesSearchProps> = ({
       }
 
       const wateringFrequency = detailedInfo
-        ? PlantAPIService.convertWateringToDays(detailedInfo.watering)
-        : PlantAPIService.convertWateringToDays(species.watering);
+        ? convertWateringToDays(detailedInfo.watering)
+        : convertWateringToDays(species.watering);
 
       const lightRequirements = detailedInfo
-        ? PlantAPIService.formatSunlight(detailedInfo.sunlight)
-        : PlantAPIService.formatSunlight(species.sunlight);
+        ? formatSunlight(detailedInfo.sunlight)
+        : formatSunlight(species.sunlight);
 
       const careInstructions = detailedInfo
         ? PlantAPIService.createCareInstructions(detailedInfo)

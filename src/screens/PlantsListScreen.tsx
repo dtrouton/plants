@@ -67,7 +67,6 @@ const PlantsListScreen: React.FC<PlantsListScreenProps> = ({navigation}) => {
     );
   };
 
-
   const renderPlantItem = ({item}: {item: Plant}) => {
     const plantNeedsWatering = needsWatering(item.last_watered);
 

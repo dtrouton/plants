@@ -1,4 +1,5 @@
 import PlantAPIService from '../PlantAPIService';
+import { convertWateringToDays, formatSunlight } from '../../utils/plantUtils';
 import axios from 'axios';
 import { PERENUAL_API_KEY, PERENUAL_BASE_URL } from '../../constants/api';
 
@@ -138,43 +139,43 @@ describe('PlantAPIService', () => {
 
   describe('convertWateringToDays', () => {
     it('should convert common watering frequencies correctly', () => {
-      expect(PlantAPIService.convertWateringToDays('daily')).toBe(1);
-      expect(PlantAPIService.convertWateringToDays('twice a week')).toBe(3);
-      expect(PlantAPIService.convertWateringToDays('weekly')).toBe(7);
-      expect(PlantAPIService.convertWateringToDays('biweekly')).toBe(14);
-      expect(PlantAPIService.convertWateringToDays('monthly')).toBe(30);
-      expect(PlantAPIService.convertWateringToDays('rarely')).toBe(60);
+      expect(convertWateringToDays('daily')).toBe(1);
+      expect(convertWateringToDays('twice a week')).toBe(3);
+      expect(convertWateringToDays('weekly')).toBe(7);
+      expect(convertWateringToDays('biweekly')).toBe(14);
+      expect(convertWateringToDays('monthly')).toBe(30);
+      expect(convertWateringToDays('rarely')).toBe(60);
     });
 
     it('should extract days from "every X days" format', () => {
-      expect(PlantAPIService.convertWateringToDays('every 5 days')).toBe(5);
-      expect(PlantAPIService.convertWateringToDays('every 10 days')).toBe(10);
+      expect(convertWateringToDays('every 5 days')).toBe(5);
+      expect(convertWateringToDays('every 10 days')).toBe(10);
     });
 
     it('should return default for unknown frequencies', () => {
-      expect(PlantAPIService.convertWateringToDays('unknown frequency')).toBe(7);
-      expect(PlantAPIService.convertWateringToDays('some random text')).toBe(7);
+      expect(convertWateringToDays('unknown frequency')).toBe(7);
+      expect(convertWateringToDays('some random text')).toBe(7);
     });
 
     it('should return null for undefined input', () => {
-      expect(PlantAPIService.convertWateringToDays()).toBeNull();
+      expect(convertWateringToDays()).toBeNull();
     });
   });
 
   describe('formatSunlight', () => {
     it('should format multiple sunlight requirements', () => {
-      expect(PlantAPIService.formatSunlight(['Full sun', 'Partial shade'])).toBe(
+      expect(formatSunlight(['Full sun', 'Partial shade'])).toBe(
         'Full sun, Partial shade'
       );
     });
 
     it('should handle single sunlight requirement', () => {
-      expect(PlantAPIService.formatSunlight(['Full sun'])).toBe('Full sun');
+      expect(formatSunlight(['Full sun'])).toBe('Full sun');
     });
 
     it('should return "Unknown" for empty or undefined arrays', () => {
-      expect(PlantAPIService.formatSunlight([])).toBe('Unknown');
-      expect(PlantAPIService.formatSunlight()).toBe('Unknown');
+      expect(formatSunlight([])).toBe('Unknown');
+      expect(formatSunlight()).toBe('Unknown');
     });
   });
 
