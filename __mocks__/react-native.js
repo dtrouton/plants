@@ -53,7 +53,6 @@ const MockFlatList = (props) => {
 };
 MockFlatList.displayName = 'MockedFlatList';
 
-const mockScrollTo = jest.fn();
 
 module.exports = {
   // Core components
