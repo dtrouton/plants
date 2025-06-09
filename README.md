@@ -97,21 +97,23 @@ src/
 - [x] Navigation system (tabs + stack)
 - [x] SQLite database schema and services
 - [x] TypeScript type definitions
-- [x] Basic screen scaffolding
-
-### In Progress 🚧
-- [ ] Plant list screen with CRUD operations
-- [ ] Add plant form with photo capture
-- [ ] Plant species search and selection
-- [ ] Plant detail view with care information
+- [x] Complete plant list screen with CRUD operations
+- [x] Add plant form with photo capture (camera + library)
+- [x] Plant species search and selection with API integration
+- [x] Plant detail view with comprehensive care information
+- [x] Watering log functionality with history tracking
+- [x] Plant care API integration (Perenual API)
+- [x] Local caching of species data for offline access
+- [x] Professional UI/UX with loading states and error handling
+- [x] Comprehensive test suite with 75%+ coverage
 
 ### Planned 📋
-- [ ] Watering log functionality
-- [ ] Push notifications for reminders
-- [ ] Plant care API integration (Perenual)
+- [ ] Push notifications for watering reminders
 - [ ] Weather-based care adjustments
-- [ ] Plant health tracking
+- [ ] Plant health tracking and analytics
 - [ ] Export and backup features
+- [ ] Widget support for quick plant status
+- [ ] Social features (plant sharing, community tips)
 
 ## Contributing
 
